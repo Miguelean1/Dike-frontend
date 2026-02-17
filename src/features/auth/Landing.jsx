@@ -6,7 +6,7 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center p-6">
-      <img src="https://res.cloudinary.com/dhhxrrgut/image/upload/v1771345261/logoDef1_fwjpip.png" alt="logo" className="w-2 h-2"/>
+      <img src="https://res.cloudinary.com/dhhxrrgut/image/upload/v1771345261/logoDef1_fwjpip.png" alt="logo" className="w-20 h-20"/>
       <div className="w-32 h-32 bg-red-500 rounded-full mb-8 flex items-center justify-center">
         <span className="text-white text-4xl font-bold">DIKE</span>
       </div>
