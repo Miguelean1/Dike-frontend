@@ -22,7 +22,7 @@ const DetailCard = () => {
           estado: 'Como nuevo',
           entrega: 'Se entrega sin desmontar',
           zona: 'Zona del Alamillo',
-          imagen: 'https://via.placeholder.com/800x600?text=Sofa+Tresillo', // Cambia esto por una imagen real si tienes
+          imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', 
           usuario: {
             id: 123,
             nombre: 'Carmen Sandiego',
