@@ -1,17 +1,8 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Landing from './features/auth/Landing';
-import Login from './features/auth/Login';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './routes';
 
 function App() {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Landing />} />
-        <Route path="/login" element={<Login />} />
-        
-      </Routes>
-    </BrowserRouter>
-  );
+  return <RouterProvider router={router} />;
 }
 
 export default App;
