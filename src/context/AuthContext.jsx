@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { login as apiLogin, register as apiRegister } from '@/services/api'
+import { login as apiLogin, register as apiRegister, getUser } from '@/services/api'
 
 const AuthContext = createContext(null)
 
@@ -9,30 +9,40 @@ export function AuthProvider({ children }) {
 
   useEffect(() => {
     const stored = localStorage.getItem('user')
-    if (stored) {
-      setUser(JSON.parse(stored))
-    }
+    if (stored) setUser(JSON.parse(stored))
     setLoading(false)
   }, [])
+
+  const saveUser = (userData) => {
+    localStorage.setItem('user', JSON.stringify(userData))
+    setUser(userData)
+  }
 
   const login = async (email, password) => {
     const { data } = await apiLogin({ email, password })
     localStorage.setItem('token', data.token)
-    const payload = parseJwt(data.token)
-    const userData = { id: payload.id, role: payload.role }
-    localStorage.setItem('user', JSON.stringify(userData))
-    setUser(userData)
+    const { id, role } = parseJwt(data.token)
+    const { data: profile } = await getUser(id)
+    const userData = { id, role, username: profile.username, profile_picture: profile.profile_picture }
+    saveUser(userData)
     return userData
   }
 
   const register = async (email, password, username) => {
     const { data } = await apiRegister({ email, password, username })
     localStorage.setItem('token', data.token)
-    const payload = parseJwt(data.token)
-    const userData = { id: payload.id, role: payload.role }
-    localStorage.setItem('user', JSON.stringify(userData))
-    setUser(userData)
+    const { id, role } = parseJwt(data.token)
+    const { data: profile } = await getUser(id)
+    const userData = { id, role, username: profile.username, profile_picture: profile.profile_picture }
+    saveUser(userData)
     return userData
+  }
+
+  const refreshUser = async () => {
+    if (!user?.id) return
+    const { data: profile } = await getUser(user.id)
+    const userData = { ...user, username: profile.username, profile_picture: profile.profile_picture }
+    saveUser(userData)
   }
 
   const logout = () => {
@@ -42,7 +52,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   )

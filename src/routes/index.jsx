@@ -7,6 +7,7 @@ import Feed from '@/pages/Feed'
 import DetailCard from '@/pages/DetailCard'
 import CreatePost from '@/pages/CreatePost'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import UserProfile from '@/pages/UserProfile'
 
 export const router = createBrowserRouter([
   { path: '/', element: <Landing /> },
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
     children: [
       { path: '/feed', element: <Feed /> },
       { path: '/anuncio/:id', element: <DetailCard /> },
+      { path: '/perfil/:id', element: <UserProfile /> },
       {
         path: '/publicar',
         element: <ProtectedRoute><CreatePost /></ProtectedRoute>,
