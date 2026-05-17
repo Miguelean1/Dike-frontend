@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getRequests, updateRequest } from '@/services/api'
+import { getRequests, updateRequest, createRating } from '@/services/api'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { Badge } from '@/components/ui/badge'
+import { Star, X } from 'lucide-react'
 
 const STATUS_STYLES = {
   pending:  'border-amber-400 text-amber-700',
@@ -24,34 +25,114 @@ function StatusBadge({ status }) {
   )
 }
 
-function RequestRow({ req, actions }) {
+function RatingForm({ req, onDone }) {
+  const [score, setScore] = useState(0)
+  const [hovered, setHovered] = useState(0)
+  const [comment, setComment] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (score === 0) { setError('Selecciona una puntuación.'); return }
+    setSubmitting(true)
+    setError('')
+    try {
+      await createRating({
+        rated_user_id: req.Post.author.id,
+        post_id: req.Post.id,
+        score,
+        comment: comment.trim() || undefined,
+      })
+      onDone()
+    } catch (err) {
+      setError(err.response?.data?.error || 'Error al enviar la valoración.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   return (
-    <div className="border-b border-stone-200 last:border-0 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-      <div className="flex flex-col gap-1">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Link to={`/anuncio/${req.post?.id}`} className="text-sm font-bold text-stone-900 hover:underline">
-            {req.post?.title ?? 'Anuncio'}
-          </Link>
-          <StatusBadge status={req.status} />
-        </div>
-        {req.message && (
-          <p className="text-xs text-stone-500 italic">"{req.message}"</p>
-        )}
-        <p className="text-[10px] text-stone-400 uppercase tracking-widest">
-          {new Date(req.request_date).toLocaleDateString('es-ES')}
-          {req.return_date && ` · Devolver: ${new Date(req.return_date).toLocaleDateString('es-ES')}`}
+    <form onSubmit={handleSubmit} className="mt-3 border border-stone-200 bg-stone-50 p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] uppercase tracking-widest text-stone-500 font-bold">
+          Valorar a {req.Post.author?.username}
         </p>
-        {req.requester && (
-          <Link to={`/perfil/${req.requester.id}`} className="text-xs text-stone-500 hover:text-stone-900">
-            {req.requester.username}
-          </Link>
+        <button type="button" onClick={onDone} className="text-stone-400 hover:text-stone-700">
+          <X size={14} />
+        </button>
+      </div>
+
+      <div className="flex gap-1">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            onMouseEnter={() => setHovered(n)}
+            onMouseLeave={() => setHovered(0)}
+            onClick={() => setScore(n)}
+            className="p-0.5"
+          >
+            <Star
+              size={20}
+              className={n <= (hovered || score) ? 'fill-stone-800 text-stone-800' : 'text-stone-300'}
+            />
+          </button>
+        ))}
+      </div>
+
+      <textarea
+        value={comment}
+        onChange={(e) => setComment(e.target.value)}
+        placeholder="Comentario opcional..."
+        rows={2}
+        className="w-full bg-white border border-stone-300 text-stone-900 text-xs px-3 py-2 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none"
+      />
+
+      {error && <p className="text-xs text-red-700">{error}</p>}
+
+      <button
+        type="submit"
+        disabled={submitting}
+        className="text-xs uppercase tracking-widest px-4 py-1.5 bg-stone-900 text-stone-100 hover:bg-stone-700 transition-colors disabled:opacity-40"
+      >
+        {submitting ? 'Enviando...' : 'Enviar valoración'}
+      </button>
+    </form>
+  )
+}
+
+function RequestRow({ req, actions, ratingForm }) {
+  return (
+    <div className="border-b border-stone-200 last:border-0 py-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div className="flex flex-col gap-1">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link to={`/anuncio/${req.Post?.id}`} className="text-sm font-bold text-stone-900 hover:underline">
+              {req.Post?.title ?? 'Anuncio'}
+            </Link>
+            <StatusBadge status={req.status} />
+          </div>
+          {req.message && (
+            <p className="text-xs text-stone-500 italic">"{req.message}"</p>
+          )}
+          <p className="text-[10px] text-stone-400 uppercase tracking-widest">
+            {new Date(req.request_date).toLocaleDateString('es-ES')}
+            {req.return_date && ` · Devolver: ${new Date(req.return_date).toLocaleDateString('es-ES')}`}
+          </p>
+          {req.requester && (
+            <Link to={`/perfil/${req.requester.id}`} className="text-xs text-stone-500 hover:text-stone-900">
+              {req.requester.username}
+            </Link>
+          )}
+        </div>
+        {actions && (
+          <div className="flex gap-2 shrink-0">
+            {actions}
+          </div>
         )}
       </div>
-      {actions && (
-        <div className="flex gap-2 shrink-0">
-          {actions}
-        </div>
-      )}
+      {ratingForm}
     </div>
   )
 }
@@ -61,6 +142,8 @@ export default function MyRequests() {
   const [received, setReceived] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [ratingOpen, setRatingOpen] = useState(null)
+  const [rated, setRated] = useState(new Set())
 
   useEffect(() => {
     async function load() {
@@ -86,8 +169,12 @@ export default function MyRequests() {
       const update = (list) => list.map((r) => r.id === id ? { ...r, status } : r)
       if (type === 'sent') setSent(update)
       else setReceived(update)
-    } catch {
-    }
+    } catch {}
+  }
+
+  const handleRated = (reqId) => {
+    setRated((prev) => new Set([...prev, reqId]))
+    setRatingOpen(null)
   }
 
   if (loading) {
@@ -167,14 +254,32 @@ export default function MyRequests() {
                   <RequestRow
                     key={req.id}
                     req={req}
-                    actions={req.status === 'pending' && (
-                      <button
-                        onClick={() => handleStatus(req.id, 'rejected', 'sent')}
-                        className="text-xs uppercase tracking-widest px-3 py-1.5 border border-stone-400 text-stone-600 hover:border-red-400 hover:text-red-600 transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                    )}
+                    actions={
+                      req.status === 'pending' ? (
+                        <button
+                          onClick={() => handleStatus(req.id, 'rejected', 'sent')}
+                          className="text-xs uppercase tracking-widest px-3 py-1.5 border border-stone-400 text-stone-600 hover:border-red-400 hover:text-red-600 transition-colors"
+                        >
+                          Cancelar
+                        </button>
+                      ) : req.status === 'accepted' && req.Post?.author && !rated.has(req.id) && ratingOpen !== req.id ? (
+                        <button
+                          onClick={() => setRatingOpen(req.id)}
+                          className="flex items-center gap-1.5 text-xs uppercase tracking-widest px-3 py-1.5 border border-stone-400 text-stone-600 hover:border-stone-900 hover:text-stone-900 transition-colors"
+                        >
+                          <Star size={12} />
+                          Valorar
+                        </button>
+                      ) : null
+                    }
+                    ratingForm={
+                      ratingOpen === req.id && (
+                        <RatingForm
+                          req={req}
+                          onDone={() => handleRated(req.id)}
+                        />
+                      )
+                    }
                   />
                 ))
               )}
