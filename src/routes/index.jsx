@@ -9,6 +9,8 @@ import CreatePost from '@/pages/CreatePost'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import UserProfile from '@/pages/UserProfile'
 import MyRequests from '@/pages/MyRequests'
+import Messages from '@/pages/Messages'
+import Chat from '@/pages/Chat'
 
 export const router = createBrowserRouter([
   { path: '/', element: <Landing /> },
@@ -27,6 +29,14 @@ export const router = createBrowserRouter([
       {
         path: '/publicar',
         element: <ProtectedRoute><CreatePost /></ProtectedRoute>,
+      },
+      {
+        path: '/mensajes',
+        element: <ProtectedRoute><Messages /></ProtectedRoute>,
+      },
+      {
+        path: '/mensajes/:userId',
+        element: <ProtectedRoute><Chat /></ProtectedRoute>,
       },
     ],
   },

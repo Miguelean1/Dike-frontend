@@ -1,12 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, Link } from 'react-router-dom'
 import { getUser, getUserRatings, updateUser } from '@/services/api'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { ImagePlus, Star, Pencil, X } from 'lucide-react'
+import { ImagePlus, Star, Pencil, X, MessageSquare } from 'lucide-react'
 
 export default function UserProfile() {
   const { id } = useParams()
@@ -122,15 +122,26 @@ export default function UserProfile() {
             <p className="text-stone-500 text-xs tracking-[0.3em] uppercase mb-1">Perfil</p>
             <h1 className="text-2xl font-black text-stone-900 tracking-tight">{profile.username}</h1>
           </div>
-          {isOwn && !editing && (
-            <button
-              onClick={startEdit}
-              className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-stone-600 border border-stone-400 px-3 py-1.5 hover:border-stone-900 hover:text-stone-900 transition-colors"
-            >
-              <Pencil size={12} />
-              Editar
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {isOwn && !editing && (
+              <button
+                onClick={startEdit}
+                className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-stone-600 border border-stone-400 px-3 py-1.5 hover:border-stone-900 hover:text-stone-900 transition-colors"
+              >
+                <Pencil size={12} />
+                Editar
+              </button>
+            )}
+            {!isOwn && authUser && (
+              <Link
+                to={`/mensajes/${id}`}
+                className="flex items-center gap-1.5 text-xs uppercase tracking-widest text-stone-600 border border-stone-400 px-3 py-1.5 hover:border-stone-900 hover:text-stone-900 transition-colors"
+              >
+                <MessageSquare size={12} />
+                Mensaje
+              </Link>
+            )}
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">

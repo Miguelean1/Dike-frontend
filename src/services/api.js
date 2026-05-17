@@ -30,6 +30,7 @@ export const getRequests = (type) => api.get('/requests', { params: { type } })
 export const createRequest = (data) => api.post('/requests', data)
 export const updateRequest = (id, status) => api.put(`/requests/${id}`, { status })
 
+export const getConversations = () => api.get('/messages')
 export const getMessages = (userId) => api.get(`/messages/${userId}`)
 export const sendMessage = (data) => api.post('/messages', data)
 export const markMessageRead = (id) => api.put(`/messages/${id}/read`)
