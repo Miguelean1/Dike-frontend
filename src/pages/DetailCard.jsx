@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getPost } from '@/services/api'
+import { getPost, createRequest } from '@/services/api'
+import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 
@@ -13,13 +14,21 @@ const TYPE_LABELS = {
 export default function DetailCard() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const { user } = useAuth()
+
   const [post, setPost] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
+  const [showForm, setShowForm] = useState(false)
+  const [message, setMessage] = useState('')
+  const [returnDate, setReturnDate] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [requestError, setRequestError] = useState('')
+  const [requestSent, setRequestSent] = useState(false)
+
   useEffect(() => {
     let cancelled = false
-
     async function load() {
       try {
         const { data } = await getPost(id)
@@ -30,14 +39,30 @@ export default function DetailCard() {
         if (!cancelled) setLoading(false)
       }
     }
-
     load()
     return () => { cancelled = true }
   }, [id])
 
+  const handleRequest = async (e) => {
+    e.preventDefault()
+    setRequestError('')
+    setSubmitting(true)
+    try {
+      const body = { post_id: Number(id), message }
+      if (post.type === 'loan' && returnDate) body.return_date = returnDate
+      await createRequest(body)
+      setRequestSent(true)
+      setShowForm(false)
+    } catch (err) {
+      setRequestError(err.response?.data?.error || 'Error al enviar la solicitud.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-full bg-transparent flex items-center justify-center">
+      <div className="min-h-full flex items-center justify-center">
         <p className="text-stone-500 text-sm tracking-widest uppercase">Cargando...</p>
       </div>
     )
@@ -45,7 +70,7 @@ export default function DetailCard() {
 
   if (error || !post) {
     return (
-      <div className="min-h-full bg-transparent flex flex-col items-center justify-center gap-4 p-8">
+      <div className="min-h-full flex flex-col items-center justify-center gap-4 p-8">
         <p className="text-stone-700 text-sm">{error || 'Anuncio no encontrado.'}</p>
         <button
           onClick={() => navigate('/feed')}
@@ -58,6 +83,7 @@ export default function DetailCard() {
   }
 
   const { title, description, category, image, type, status, creation_date, author, tags = [] } = post
+  const isOwn = user?.id === author?.id
 
   return (
     <div className="min-h-full bg-transparent">
@@ -74,11 +100,7 @@ export default function DetailCard() {
           <div className="border border-stone-300 overflow-hidden bg-white">
             <div className="relative w-full aspect-[4/3] bg-stone-100">
               {image ? (
-                <img
-                  src={image}
-                  alt={title}
-                  className="w-full h-full object-cover"
-                />
+                <img src={image} alt={title} className="w-full h-full object-cover" />
               ) : (
                 <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs uppercase tracking-widest">
                   Sin imagen
@@ -106,18 +128,14 @@ export default function DetailCard() {
               {tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-6">
                   {tags.map((tag) => (
-                    <Badge
-                      key={tag.id}
-                      variant="outline"
-                      className="text-[10px] uppercase tracking-wider border-stone-400 text-stone-500 rounded-none"
-                    >
+                    <Badge key={tag.id} variant="outline" className="text-[10px] uppercase tracking-wider border-stone-400 text-stone-500 rounded-none">
                       {tag.name}
                     </Badge>
                   ))}
                 </div>
               )}
 
-              <div className="border-t border-stone-200 pt-4 space-y-2 text-xs">
+              <div className="border-t border-stone-200 pt-4 space-y-2 text-xs mb-6">
                 <div className="flex justify-between">
                   <span className="text-stone-500 uppercase tracking-widest">Estado</span>
                   <span className="text-stone-900 font-medium capitalize">{status}</span>
@@ -130,9 +148,74 @@ export default function DetailCard() {
                 )}
               </div>
 
-              <button className="w-full mt-6 py-3 bg-stone-900 text-stone-100 text-xs uppercase tracking-widest font-bold hover:bg-stone-800 transition-colors">
-                Contactar
-              </button>
+              {requestSent && (
+                <div className="border border-stone-300 bg-stone-50 px-4 py-3 text-stone-700 text-xs text-center mb-4">
+                  Solicitud enviada correctamente.
+                </div>
+              )}
+
+              {!requestSent && status === 'active' && (
+                isOwn ? (
+                  <p className="text-xs text-center text-stone-400 uppercase tracking-widest py-3 border border-stone-200">
+                    Es tu anuncio
+                  </p>
+                ) : !user ? (
+                  <Link
+                    to="/login"
+                    className="block w-full text-center text-xs uppercase tracking-widest font-bold bg-stone-900 text-stone-100 py-3 hover:bg-stone-800 transition-colors"
+                  >
+                    Accede para solicitar
+                  </Link>
+                ) : !showForm ? (
+                  <button
+                    onClick={() => setShowForm(true)}
+                    className="w-full py-3 bg-stone-900 text-stone-100 text-xs uppercase tracking-widest font-bold hover:bg-stone-800 transition-colors"
+                  >
+                    Solicitar
+                  </button>
+                ) : (
+                  <form onSubmit={handleRequest} className="space-y-3 border-t border-stone-200 pt-4">
+                    <textarea
+                      value={message}
+                      onChange={(e) => setMessage(e.target.value)}
+                      placeholder="Mensaje para el dueño (opcional)"
+                      rows={3}
+                      className="w-full bg-white border border-stone-300 text-stone-900 text-xs px-3 py-2 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none"
+                    />
+                    {type === 'loan' && (
+                      <div className="space-y-1">
+                        <label className="text-stone-600 text-xs uppercase tracking-widest">Fecha de devolución</label>
+                        <input
+                          type="date"
+                          value={returnDate}
+                          onChange={(e) => setReturnDate(e.target.value)}
+                          required
+                          className="w-full bg-white border border-stone-300 text-stone-900 text-xs px-3 py-2 focus:outline-none focus:ring-2 focus:ring-stone-500"
+                        />
+                      </div>
+                    )}
+                    {requestError && (
+                      <p className="text-xs text-red-700 border border-red-300 bg-red-50 px-3 py-2">{requestError}</p>
+                    )}
+                    <div className="flex gap-2">
+                      <button
+                        type="submit"
+                        disabled={submitting}
+                        className="flex-1 py-2 bg-stone-900 text-stone-100 text-xs uppercase tracking-widest font-bold hover:bg-stone-800 transition-colors disabled:opacity-50"
+                      >
+                        {submitting ? 'Enviando...' : 'Confirmar'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setShowForm(false)}
+                        className="px-4 text-xs uppercase tracking-widest border border-stone-400 text-stone-600 hover:border-stone-900 hover:text-stone-900 transition-colors"
+                      >
+                        Cancelar
+                      </button>
+                    </div>
+                  </form>
+                )
+              )}
             </div>
 
             {author && (

@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { User, LogOut, Plus, MessageSquare } from 'lucide-react'
+import { User, LogOut, Plus, MessageSquare, ClipboardList } from 'lucide-react'
 import Logo from '@/components/Logo'
 
 export default function Navbar() {
@@ -78,6 +78,15 @@ export default function Navbar() {
                     >
                       <User size={14} />
                       Mi perfil
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      to="/mis-solicitudes"
+                      className="flex items-center gap-2 cursor-pointer focus:bg-neutral-800 focus:text-stone-100"
+                    >
+                      <ClipboardList size={14} />
+                      Mis solicitudes
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator className="bg-stone-800" />

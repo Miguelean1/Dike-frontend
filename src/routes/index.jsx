@@ -8,6 +8,7 @@ import DetailCard from '@/pages/DetailCard'
 import CreatePost from '@/pages/CreatePost'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import UserProfile from '@/pages/UserProfile'
+import MyRequests from '@/pages/MyRequests'
 
 export const router = createBrowserRouter([
   { path: '/', element: <Landing /> },
@@ -19,6 +20,10 @@ export const router = createBrowserRouter([
       { path: '/feed', element: <Feed /> },
       { path: '/anuncio/:id', element: <DetailCard /> },
       { path: '/perfil/:id', element: <UserProfile /> },
+      {
+        path: '/mis-solicitudes',
+        element: <ProtectedRoute><MyRequests /></ProtectedRoute>,
+      },
       {
         path: '/publicar',
         element: <ProtectedRoute><CreatePost /></ProtectedRoute>,
