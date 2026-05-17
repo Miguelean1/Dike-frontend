@@ -4,6 +4,7 @@ import { useAuth } from '@/context/AuthContext'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
+import Logo from '@/components/Logo'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -29,22 +30,21 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-950 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-paper px-4">
       <div className="w-full max-w-sm">
 
-        {/* Cabecera */}
-        <div className="border-t-4 border-b border-stone-100 pb-4 mb-8">
-          <Link to="/" className="block text-center">
-            <span className="text-4xl font-black text-stone-100 tracking-tight">DIKË</span>
+        <div className="border-t-4 border-b border-stone-900 pb-4 mb-8">
+          <Link to="/" className="flex justify-center">
+            <Logo className="h-12" />
           </Link>
-          <p className="text-center text-stone-400 text-xs tracking-[0.25em] uppercase mt-1">
+          <p className="text-center text-stone-500 text-xs tracking-[0.25em] uppercase mt-2">
             Acceso a la plataforma
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <div className="space-y-1.5">
-            <Label className="text-stone-300 text-xs tracking-widest uppercase">
+            <Label className="text-stone-700 text-xs tracking-widest uppercase">
               Correo electrónico
             </Label>
             <Input
@@ -53,12 +53,12 @@ export default function Login() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="tu@email.com"
               required
-              className="bg-neutral-900 border-stone-700 text-stone-100 placeholder:text-stone-600 focus-visible:ring-stone-400"
+              className="bg-white border-stone-300 text-stone-900 placeholder:text-stone-400 focus-visible:ring-stone-500"
             />
           </div>
 
           <div className="space-y-1.5">
-            <Label className="text-stone-300 text-xs tracking-widest uppercase">
+            <Label className="text-stone-700 text-xs tracking-widest uppercase">
               Contraseña
             </Label>
             <Input
@@ -67,12 +67,12 @@ export default function Login() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
               required
-              className="bg-neutral-900 border-stone-700 text-stone-100 placeholder:text-stone-600 focus-visible:ring-stone-400"
+              className="bg-white border-stone-300 text-stone-900 placeholder:text-stone-400 focus-visible:ring-stone-500"
             />
           </div>
 
           {error && (
-            <p className="text-xs text-red-400 border border-red-900 bg-red-950/40 px-3 py-2">
+            <p className="text-xs text-red-700 border border-red-300 bg-red-50 px-3 py-2">
               {error}
             </p>
           )}
@@ -80,16 +80,16 @@ export default function Login() {
           <Button
             type="submit"
             disabled={loading}
-            className="w-full bg-stone-100 text-neutral-950 hover:bg-white font-bold tracking-widest uppercase text-xs rounded-none cursor-pointer"
+            className="w-full bg-stone-900 text-stone-100 hover:bg-stone-800 font-bold tracking-widest uppercase text-xs rounded-none cursor-pointer"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </Button>
         </form>
 
-        <div className="mt-8 text-center border-t border-stone-800 pt-6 space-y-2">
+        <div className="mt-8 text-center border-t border-stone-300 pt-6">
           <p className="text-stone-500 text-xs">
             ¿No tienes cuenta?{' '}
-            <Link to="/register" className="text-stone-300 hover:text-stone-100 underline">
+            <Link to="/register" className="text-stone-800 hover:text-stone-900 underline">
               Regístrate
             </Link>
           </p>

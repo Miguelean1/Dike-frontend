@@ -1,68 +1,87 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from 'react-router-dom'
+import { Badge } from '@/components/ui/badge'
+
+const TYPE_LABELS = {
+  donation: 'Donación',
+  loan: 'Préstamo',
+  exchange: 'Intercambio',
+}
 
 export default function Card({ anuncio }) {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
 
   const {
     id,
-    titulo = "Sofa tresillo",
-    descripcion = "",
-    imagen = "https://via.placeholder.com/600x400?text=Sin+imagen",
-  } = anuncio ?? {};
-
-  const handleContactar = () => {
-
-    alert("Función de contacto en construcción.");
-  };
+    titulo = 'Sin título',
+    descripcion = '',
+    imagen,
+    type,
+  } = anuncio ?? {}
 
   return (
-    <article className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow border border-gray-100">
+    <article className="bg-white border border-stone-300 hover:border-stone-500 transition-colors overflow-hidden group">
 
       <button
         type="button"
         onClick={() => navigate(`/anuncio/${id}`)}
         className="block w-full text-left"
-        aria-label={`Ver anuncio: ${titulo}`}
+        aria-label={`Ver ${titulo}`}
       >
-        <div className="w-full h-48 bg-gray-200 overflow-hidden">
-          <img
-            src={imagen}
-            alt={titulo}
-            className="w-full h-full object-cover"
-            loading="lazy"
-          />
+        <div className="w-full h-48 bg-stone-100 overflow-hidden">
+          {imagen ? (
+            <img
+              src={imagen}
+              alt={titulo}
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs uppercase tracking-widest">
+              Sin imagen
+            </div>
+          )}
         </div>
       </button>
 
       <div className="p-4">
-        <h3 className="text-lg font-semibold text-gray-900">{titulo}</h3>
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <h3 className="text-stone-900 font-bold text-sm leading-snug line-clamp-1">
+            {titulo}
+          </h3>
+          {type && (
+            <Badge
+              variant="outline"
+              className="shrink-0 text-[10px] uppercase tracking-wider border-stone-400 text-stone-500 rounded-none"
+            >
+              {TYPE_LABELS[type] ?? type}
+            </Badge>
+          )}
+        </div>
 
         {descripcion ? (
-          <p className="mt-2 text-sm text-gray-600 line-clamp-3">
+          <p className="text-stone-500 text-xs leading-relaxed line-clamp-3">
             {descripcion}
           </p>
         ) : (
-          <p className="mt-2 text-sm text-gray-500">Sin descripción.</p>
+          <p className="text-stone-400 text-xs italic">Sin descripción.</p>
         )}
 
-    
-        <div className="mt-4 flex gap-2">
+        <div className="mt-4 flex gap-2 border-t border-stone-200 pt-4">
           <Link
             to={`/anuncio/${id}`}
-            className="flex-1 text-center rounded-lg bg-blue-600 px-4 py-2 text-white font-medium hover:bg-blue-700 transition-colors"
+            className="flex-1 text-center text-xs uppercase tracking-widest font-bold bg-stone-900 text-stone-100 py-2 hover:bg-stone-800 transition-colors"
           >
             Ver
           </Link>
-
           <button
             type="button"
-            onClick={handleContactar}
-            className="flex-1 rounded-lg bg-emerald-600 px-4 py-2 text-white font-medium hover:bg-emerald-700 transition-colors"
+            onClick={() => alert('Función de contacto en construcción.')}
+            className="flex-1 text-center text-xs uppercase tracking-widest font-bold border border-stone-400 text-stone-600 py-2 hover:border-stone-900 hover:text-stone-900 transition-colors"
           >
             Contactar
           </button>
         </div>
       </div>
     </article>
-  );
+  )
 }

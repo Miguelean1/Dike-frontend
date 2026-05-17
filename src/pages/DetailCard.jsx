@@ -8,7 +8,6 @@ const DetailCard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // fetch en back
     const loadData = async () => {
       try {
         
@@ -33,8 +32,7 @@ const DetailCard = () => {
         };
         
         setAnuncio(data);
-      } catch (error) {
-        console.error("Error cargando anuncio:", error);
+      } catch {
       } finally {
         setLoading(false);
       }

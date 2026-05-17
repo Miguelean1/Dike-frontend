@@ -1,146 +1,100 @@
-import { useEffect, useMemo, useState } from "react";
-import Card from "../components/Card";
+import { useEffect, useMemo, useState } from 'react'
+import Card from '@/components/Card'
+import { Input } from '@/components/ui/input'
+import { Search } from 'lucide-react'
+import { getPosts } from '@/services/api'
 
-const USE_API = false; // TRUE para backend
+const USE_API = false
+
+const MOCK = [
+  { id: 1, titulo: 'Sofá tresillo', descripcion: 'Conjunto de sofá de dos plazas y dos sillones. Un sofá pequeño que está un poco reventado pero aún se puede usar. Y además, dos sillones orejeros que están prácticamente nuevos.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'donation' },
+  { id: 2, titulo: 'Sofá tresillo', descripcion: 'Conjunto de sofá de dos plazas y dos sillones. Se entrega sin desmontar. Zona del Alamillo.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'loan' },
+  { id: 3, titulo: 'Sofá tresillo', descripcion: 'Conjunto de sofá de dos plazas y dos sillones.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'donation' },
+  { id: 4, titulo: 'Sofá tresillo', descripcion: 'Como nuevo. Ideal para salón.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'exchange' },
+  { id: 5, titulo: 'Sofá tresillo', descripcion: 'Buen estado general. Recogida en mano.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'loan' },
+  { id: 6, titulo: 'Sofá tresillo', descripcion: 'Disponible esta semana.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'donation' },
+]
 
 export default function Feed() {
-  const [query, setQuery] = useState("");
-  const [items, setItems] = useState([]);
-  const [status, setStatus] = useState({ loading: true, error: "" });
+  const [query, setQuery] = useState('')
+  const [items, setItems] = useState([])
+  const [status, setStatus] = useState({ loading: true, error: '' })
 
   useEffect(() => {
-    let cancelled = false;
+    let cancelled = false
 
     async function load() {
       try {
-        setStatus({ loading: true, error: "" });
-
-        // Backend 
+        setStatus({ loading: true, error: '' })
         if (USE_API) {
-          const res = await fetch("/api/ads");
-          if (!res.ok) throw new Error("No se pudieron cargar los anuncios");
-          const data = await res.json();
-          if (!cancelled) setItems(Array.isArray(data) ? data : []);
-          return;
+          const { data } = await getPosts()
+          if (!cancelled) setItems(Array.isArray(data) ? data : [])
+          return
         }
-
-        // Mock (MVP)
-        const mock = [
-          {
-            id: 1,
-            titulo: "Sofa tresillo",
-            descripcion:
-              "Conjunto de sofa de dos plazas y dos sillones. Un sofa pequeño que está un poco reventado pero aún se puede usar. Y además, dos sillones orejeros que están practicamente nuevos.",
-            imagen: "https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg",
-          },
-          {
-            id: 2,
-            titulo: "Sofa tresillo",
-            descripcion:
-              "Conjunto de sofa de dos plazas y dos sillones. Se entrega sin desmontar. Zona del Alamillo.",
-            imagen: "https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg",
-          },
-          {
-            id: 3,
-            titulo: "Sofa tresillo",
-            descripcion: "Conjunto de sofa de dos plazas y dos sillones.",
-            imagen: "https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg",
-          },
-          {
-            id: 4,
-            titulo: "Sofa tresillo",
-            descripcion: "Como nuevo. Ideal para salón.",
-            imagen: "https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg",
-          },
-          {
-            id: 5,
-            titulo: "Sofa tresillo",
-            descripcion: "Buen estado general. Recogida en mano.",
-            imagen: "https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg",
-          },
-          {
-            id: 6,
-            titulo: "Sofa tresillo",
-            descripcion: "Disponible esta semana.",
-            imagen: "https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg",
-          },
-        ];
-
-        if (!cancelled) setItems(mock);
+        if (!cancelled) setItems(MOCK)
       } catch (e) {
-        if (!cancelled) {
-          setItems([]);
-          setStatus({
-            loading: false,
-            error: e instanceof Error ? e.message : "Error desconocido",
-          });
-        }
+        if (!cancelled) setStatus({ loading: false, error: e.message ?? 'Error desconocido' })
+        return
       } finally {
-        if (!cancelled) setStatus((s) => ({ ...s, loading: false }));
+        if (!cancelled) setStatus((s) => ({ ...s, loading: false }))
       }
     }
 
-    load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    load()
+    return () => { cancelled = true }
+  }, [])
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return items;
-
-    return items.filter((a) => {
-      const t = (a.titulo ?? "").toLowerCase();
-      const d = (a.descripcion ?? "").toLowerCase();
-      return t.includes(q) || d.includes(q);
-    });
-  }, [items, query]);
+    const q = query.trim().toLowerCase()
+    if (!q) return items
+    return items.filter((a) =>
+      (a.titulo ?? '').toLowerCase().includes(q) ||
+      (a.descripcion ?? '').toLowerCase().includes(q)
+    )
+  }, [items, query])
 
   return (
-    <div className="bg-gray-50 min-h-full">
+    <div className="min-h-full bg-paper">
       <div className="max-w-7xl mx-auto px-4 py-8">
-        
-        <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between mb-6">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900">DIKË</h1>
-            <p className="text-gray-600 mt-1">
-              Explora anuncios y abre el detalle con “Ver”.
-            </p>
-          </div>
 
-          <div className="w-full md:w-[420px]">
-            <label className="sr-only" htmlFor="search">
-              Buscar
-            </label>
-            <div className="relative">
-              <input
-                id="search"
+        <div className="border-b border-stone-400 pb-6 mb-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-stone-500 text-xs tracking-[0.3em] uppercase mb-1">
+                Anuncios · Última edición
+              </p>
+              <h2 className="text-2xl font-black text-stone-900 tracking-tight">
+                Tablón de anuncios
+              </h2>
+            </div>
+
+            <div className="relative w-full sm:w-72">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-stone-400 pointer-events-none" />
+              <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Busca algo..."
-                className="w-full rounded-full border border-gray-300 bg-white px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="Buscar anuncios..."
+                className="pl-8 bg-white border-stone-300 text-stone-900 placeholder:text-stone-400 focus-visible:ring-stone-500 rounded-none"
               />
-              <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
-                🔍
-              </span>
             </div>
           </div>
         </div>
 
         {status.loading && (
-          <div className="py-16 text-center text-gray-600">Cargando...</div>
+          <div className="py-16 text-center text-stone-500 text-sm tracking-widest uppercase">
+            Cargando...
+          </div>
         )}
 
         {!status.loading && status.error && (
-          <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-700">
+          <div className="border border-red-300 bg-red-50 px-4 py-3 text-red-700 text-sm">
             {status.error}
           </div>
         )}
 
         {!status.loading && !status.error && filtered.length === 0 && (
-          <div className="py-16 text-center text-gray-600">
-            No hay resultados para “{query}”.
+          <div className="py-16 text-center text-stone-500 text-sm">
+            No hay resultados para "{query}".
           </div>
         )}
 
@@ -153,5 +107,5 @@ export default function Feed() {
         )}
       </div>
     </div>
-  );
+  )
 }
