@@ -4,19 +4,16 @@ import { Input } from '@/components/ui/input'
 import { Search } from 'lucide-react'
 import { getPosts } from '@/services/api'
 
-const USE_API = false
-
-const MOCK = [
-  { id: 1, titulo: 'Sofá tresillo', descripcion: 'Conjunto de sofá de dos plazas y dos sillones. Un sofá pequeño que está un poco reventado pero aún se puede usar. Y además, dos sillones orejeros que están prácticamente nuevos.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'donation' },
-  { id: 2, titulo: 'Sofá tresillo', descripcion: 'Conjunto de sofá de dos plazas y dos sillones. Se entrega sin desmontar. Zona del Alamillo.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'loan' },
-  { id: 3, titulo: 'Sofá tresillo', descripcion: 'Conjunto de sofá de dos plazas y dos sillones.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'donation' },
-  { id: 4, titulo: 'Sofá tresillo', descripcion: 'Como nuevo. Ideal para salón.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'exchange' },
-  { id: 5, titulo: 'Sofá tresillo', descripcion: 'Buen estado general. Recogida en mano.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'loan' },
-  { id: 6, titulo: 'Sofá tresillo', descripcion: 'Disponible esta semana.', imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', type: 'donation' },
+const TYPE_FILTERS = [
+  { value: null, label: 'Todos' },
+  { value: 'donation', label: 'Donaciones' },
+  { value: 'loan', label: 'Préstamos' },
+  { value: 'exchange', label: 'Intercambios' },
 ]
 
 export default function Feed() {
   const [query, setQuery] = useState('')
+  const [typeFilter, setTypeFilter] = useState(null)
   const [items, setItems] = useState([])
   const [status, setStatus] = useState({ loading: true, error: '' })
 
@@ -26,14 +23,12 @@ export default function Feed() {
     async function load() {
       try {
         setStatus({ loading: true, error: '' })
-        if (USE_API) {
-          const { data } = await getPosts()
-          if (!cancelled) setItems(Array.isArray(data) ? data : [])
-          return
-        }
-        if (!cancelled) setItems(MOCK)
+        const params = { status: 'active' }
+        if (typeFilter) params.type = typeFilter
+        const { data } = await getPosts(params)
+        if (!cancelled) setItems(Array.isArray(data) ? data : [])
       } catch (e) {
-        if (!cancelled) setStatus({ loading: false, error: e.message ?? 'Error desconocido' })
+        if (!cancelled) setStatus({ loading: false, error: e.message ?? 'Error al cargar los anuncios' })
         return
       } finally {
         if (!cancelled) setStatus((s) => ({ ...s, loading: false }))
@@ -42,19 +37,19 @@ export default function Feed() {
 
     load()
     return () => { cancelled = true }
-  }, [])
+  }, [typeFilter])
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
     if (!q) return items
     return items.filter((a) =>
-      (a.titulo ?? '').toLowerCase().includes(q) ||
-      (a.descripcion ?? '').toLowerCase().includes(q)
+      (a.title ?? '').toLowerCase().includes(q) ||
+      (a.description ?? '').toLowerCase().includes(q)
     )
   }, [items, query])
 
   return (
-    <div className="min-h-full bg-paper">
+    <div className="min-h-full bg-transparent">
       <div className="max-w-7xl mx-auto px-4 py-8">
 
         <div className="border-b border-stone-400 pb-6 mb-8">
@@ -78,6 +73,22 @@ export default function Feed() {
               />
             </div>
           </div>
+
+          <div className="flex gap-2 mt-4 flex-wrap">
+            {TYPE_FILTERS.map(({ value, label }) => (
+              <button
+                key={label}
+                onClick={() => setTypeFilter(value)}
+                className={`text-xs uppercase tracking-widest px-3 py-1.5 border transition-colors ${
+                  typeFilter === value
+                    ? 'bg-stone-900 text-stone-100 border-stone-900'
+                    : 'bg-transparent text-stone-600 border-stone-400 hover:border-stone-900 hover:text-stone-900'
+                }`}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         </div>
 
         {status.loading && (
@@ -94,7 +105,7 @@ export default function Feed() {
 
         {!status.loading && !status.error && filtered.length === 0 && (
           <div className="py-16 text-center text-stone-500 text-sm">
-            No hay resultados para "{query}".
+            {query ? `No hay resultados para "${query}".` : 'No hay anuncios disponibles.'}
           </div>
         )}
 

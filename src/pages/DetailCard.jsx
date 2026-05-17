@@ -1,176 +1,163 @@
-import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { getPost } from '@/services/api'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { Badge } from '@/components/ui/badge'
 
-const DetailCard = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-  const [anuncio, setAnuncio] = useState(null);
-  const [loading, setLoading] = useState(true);
+const TYPE_LABELS = {
+  donation: 'Donación',
+  loan: 'Préstamo',
+  exchange: 'Intercambio',
+}
+
+export default function DetailCard() {
+  const { id } = useParams()
+  const navigate = useNavigate()
+  const [post, setPost] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState('')
 
   useEffect(() => {
-    const loadData = async () => {
+    let cancelled = false
+
+    async function load() {
       try {
-        
-        await new Promise(resolve => setTimeout(resolve, 800));
-
-        const data = {
-          id: id,
-          titulo: 'Sofá tresillo',
-          subtitulo: 'Conjunto de sofa de dos plazas y dos sillones',
-          descripcion: 'Un sofa pequeño que está un poco reventado pero aún se puede usar. Y además, dos sillones orejeros que están practicamente nuevos.',
-          estado: 'Como nuevo',
-          entrega: 'Se entrega sin desmontar',
-          zona: 'Zona del Alamillo',
-          imagen: 'https://res.cloudinary.com/dhhxrrgut/image/upload/v1771431205/sofaPrueba_jyirsi.jpg', 
-          usuario: {
-            id: 123,
-            nombre: 'Carmen Sandiego',
-            avatar: 'https://ui-avatars.com/api/?name=Carmen+Sandiego&background=3498db&color=fff',
-            verificado: true
-          },
-          createdAt: '2026-02-10T10:30:00Z'
-        };
-        
-        setAnuncio(data);
+        const { data } = await getPost(id)
+        if (!cancelled) setPost(data)
       } catch {
+        if (!cancelled) setError('No se pudo cargar el anuncio.')
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false)
       }
-    };
+    }
 
-    loadData();
-  }, [id]);
+    load()
+    return () => { cancelled = true }
+  }, [id])
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-gray-500 font-medium">Cargando anuncio...</p>
-        </div>
+      <div className="min-h-full bg-transparent flex items-center justify-center">
+        <p className="text-stone-500 text-sm tracking-widest uppercase">Cargando...</p>
       </div>
-    );
+    )
   }
 
-  if (!anuncio) {
+  if (error || !post) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 p-4">
-        <div className="bg-white p-8 rounded-2xl shadow-lg text-center max-w-md w-full">
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Anuncio no encontrado</h2>
-          <p className="text-gray-600 mb-6">El anuncio que buscas no existe o ha sido eliminado.</p>
-          <button
-            onClick={() => navigate('/feed')}
-            className="w-full px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors font-semibold"
-          >
-            Volver al Feed
-          </button>
-        </div>
+      <div className="min-h-full bg-transparent flex flex-col items-center justify-center gap-4 p-8">
+        <p className="text-stone-700 text-sm">{error || 'Anuncio no encontrado.'}</p>
+        <button
+          onClick={() => navigate('/feed')}
+          className="text-xs uppercase tracking-widest bg-stone-900 text-stone-100 px-6 py-2 hover:bg-stone-800 transition-colors"
+        >
+          Volver al tablón
+        </button>
       </div>
-    );
+    )
   }
+
+  const { title, description, category, image, type, status, creation_date, author, tags = [] } = post
 
   return (
-    <div className="bg-gray-50 min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-5xl mx-auto">
-       
-        <nav className="flex items-center text-sm text-gray-500 mb-6">
-          <Link to="/feed" className="hover:text-blue-600 transition-colors">
-            Feed
-          </Link>
-          <span className="mx-2">/</span>
-          <span className="text-gray-900 font-medium truncate">{anuncio.titulo}</span>
+    <div className="min-h-full bg-transparent">
+      <div className="max-w-5xl mx-auto px-4 py-8">
+
+        <nav className="flex items-center gap-2 text-xs text-stone-500 mb-6 uppercase tracking-widest">
+          <Link to="/feed" className="hover:text-stone-900 transition-colors">Tablón</Link>
+          <span>/</span>
+          <span className="text-stone-900 truncate">{title}</span>
         </nav>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          
-          <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-            <div className="aspect-w-4 aspect-h-3 bg-gray-200 relative">
-              <img
-                src={anuncio.imagen}
-                alt={anuncio.titulo}
-                className="w-full h-full object-cover absolute inset-0"
-              />
-              <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-700 shadow-sm">
-                {anuncio.estado}
-              </div>
+
+          <div className="border border-stone-300 overflow-hidden bg-white">
+            <div className="relative w-full aspect-[4/3] bg-stone-100">
+              {image ? (
+                <img
+                  src={image}
+                  alt={title}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs uppercase tracking-widest">
+                  Sin imagen
+                </div>
+              )}
+              {type && (
+                <span className="absolute top-3 left-3 text-[10px] uppercase tracking-widest bg-white border border-stone-300 text-stone-600 px-2 py-1">
+                  {TYPE_LABELS[type] ?? type}
+                </span>
+              )}
             </div>
           </div>
 
-          
-          <div className="space-y-6">
-            
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 sm:p-8">
-              <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                {anuncio.titulo}
-              </h1>
+          <div className="flex flex-col gap-6">
 
-              {anuncio.subtitulo && (
-                <p className="text-lg text-gray-600 mb-6 font-medium">
-                  {anuncio.subtitulo}
-                </p>
+            <div className="border border-stone-300 bg-white p-6">
+              <h1 className="text-2xl font-black text-stone-900 mb-3">{title}</h1>
+
+              {category && (
+                <p className="text-xs uppercase tracking-widest text-stone-500 mb-4">{category}</p>
               )}
 
-              <div className="prose prose-blue text-gray-600 mb-8 leading-relaxed">
-                {anuncio.descripcion}
+              <p className="text-stone-700 text-sm leading-relaxed mb-6">{description}</p>
+
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-6">
+                  {tags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant="outline"
+                      className="text-[10px] uppercase tracking-wider border-stone-400 text-stone-500 rounded-none"
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))}
+                </div>
+              )}
+
+              <div className="border-t border-stone-200 pt-4 space-y-2 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-stone-500 uppercase tracking-widest">Estado</span>
+                  <span className="text-stone-900 font-medium capitalize">{status}</span>
+                </div>
+                {creation_date && (
+                  <div className="flex justify-between">
+                    <span className="text-stone-500 uppercase tracking-widest">Publicado</span>
+                    <span className="text-stone-900">{new Date(creation_date).toLocaleDateString('es-ES')}</span>
+                  </div>
+                )}
               </div>
 
-             
-              <div className="bg-gray-50 rounded-xl p-5 mb-8 space-y-3">
-                <div className="flex justify-between items-center border-b border-gray-200 pb-2 last:border-0 last:pb-0">
-                  <span className="font-semibold text-gray-700">Estado</span>
-                  <span className="text-gray-900">{anuncio.estado}</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-gray-200 pb-2 last:border-0 last:pb-0">
-                  <span className="font-semibold text-gray-700">Entrega</span>
-                  <span className="text-gray-900">{anuncio.entrega}</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-gray-200 pb-2 last:border-0 last:pb-0">
-                  <span className="font-semibold text-gray-700">Zona</span>
-                  <span className="text-gray-900">{anuncio.entrega}</span>
-                </div>
-                <div className="flex justify-between items-center border-b border-gray-200 pb-2 last:border-0 last:pb-0">
-                   <span className="font-semibold text-gray-700">Publicado</span>
-                   <span className="text-gray-900">
-                    {new Date(anuncio.createdAt).toLocaleDateString()}
-                   </span>
-                </div>
-              </div>
-
-              
-              <button className="w-full py-3.5 bg-emerald-500 text-white rounded-xl hover:bg-emerald-600 transition-colors font-bold text-lg shadow-lg shadow-emerald-500/30 flex items-center justify-center gap-2">
-                <span>💬</span> Contactar ahora
+              <button className="w-full mt-6 py-3 bg-stone-900 text-stone-100 text-xs uppercase tracking-widest font-bold hover:bg-stone-800 transition-colors">
+                Contactar
               </button>
             </div>
 
-           
-            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <img
-                  src={anuncio.usuario.avatar}
-                  alt={anuncio.usuario.nombre}
-                  className="w-14 h-14 rounded-full border-2 border-gray-100"
-                />
-                <div>
-                  <p className="font-bold text-gray-900 text-lg">{anuncio.usuario.nombre}</p>
-                  {anuncio.usuario.verificado && (
-                    <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium">
-                      Usuario Verificado
-                    </span>
-                  )}
+            {author && (
+              <div className="border border-stone-300 bg-white p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Avatar className="h-10 w-10 border border-stone-300">
+                    <AvatarImage src={author.profile_picture} />
+                    <AvatarFallback className="bg-stone-100 text-stone-600 text-xs">
+                      {author.username?.[0]?.toUpperCase() ?? 'U'}
+                    </AvatarFallback>
+                  </Avatar>
+                  <span className="text-stone-900 font-bold text-sm">{author.username}</span>
                 </div>
+                <Link
+                  to={`/perfil/${author.id}`}
+                  className="text-xs uppercase tracking-widest border border-stone-400 text-stone-600 px-3 py-1.5 hover:border-stone-900 hover:text-stone-900 transition-colors"
+                >
+                  Ver perfil
+                </Link>
               </div>
-              <Link
-                to={`/perfil/${anuncio.usuario.id}`}
-                className="px-5 py-2.5 border-2 border-gray-200 text-gray-700 rounded-lg hover:border-blue-500 hover:text-blue-600 transition-colors font-semibold text-sm"
-              >
-                Ver Perfil
-              </Link>
-            </div>
+            )}
+
           </div>
         </div>
       </div>
     </div>
-  );
-};
-
-export default DetailCard;
+  )
+}

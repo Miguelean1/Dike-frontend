@@ -3,7 +3,7 @@ import Logo from '@/components/Logo'
 
 export default function Landing() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-paper px-4">
+    <div className="min-h-screen flex items-center justify-center bg-transparent px-4">
       <div className="w-full max-w-lg">
 
         <div className="border-t-4 border-b-4 border-stone-900 py-6 mb-8 text-center">

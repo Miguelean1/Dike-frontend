@@ -10,13 +10,7 @@ const TYPE_LABELS = {
 export default function Card({ anuncio }) {
   const navigate = useNavigate()
 
-  const {
-    id,
-    titulo = 'Sin título',
-    descripcion = '',
-    imagen,
-    type,
-  } = anuncio ?? {}
+  const { id, title = 'Sin título', description = '', image, type } = anuncio ?? {}
 
   return (
     <article className="bg-white border border-stone-300 hover:border-stone-500 transition-colors overflow-hidden group">
@@ -25,13 +19,13 @@ export default function Card({ anuncio }) {
         type="button"
         onClick={() => navigate(`/anuncio/${id}`)}
         className="block w-full text-left"
-        aria-label={`Ver ${titulo}`}
+        aria-label={`Ver ${title}`}
       >
         <div className="w-full h-48 bg-stone-100 overflow-hidden">
-          {imagen ? (
+          {image ? (
             <img
-              src={imagen}
-              alt={titulo}
+              src={image}
+              alt={title}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
             />
@@ -46,7 +40,7 @@ export default function Card({ anuncio }) {
       <div className="p-4">
         <div className="flex items-start justify-between gap-2 mb-2">
           <h3 className="text-stone-900 font-bold text-sm leading-snug line-clamp-1">
-            {titulo}
+            {title}
           </h3>
           {type && (
             <Badge
@@ -58,9 +52,9 @@ export default function Card({ anuncio }) {
           )}
         </div>
 
-        {descripcion ? (
+        {description ? (
           <p className="text-stone-500 text-xs leading-relaxed line-clamp-3">
-            {descripcion}
+            {description}
           </p>
         ) : (
           <p className="text-stone-400 text-xs italic">Sin descripción.</p>
