@@ -16,8 +16,6 @@ Sin dinero de por medio. Sin plataformas frías. Solo personas ayudando a person
 
 ## Capturas de pantalla
 
-
-
 *Las capturas llegarán pronto.*
 
 ---
@@ -35,14 +33,15 @@ Sin dinero de por medio. Sin plataformas frías. Solo personas ayudando a person
 
 ## Stack tecnológico
 
-
- Framework UI | React 19 
- Routing | React Router DOM 7 
- Build tool | Vite 7 + SWC 
- Estilos | Tailwind CSS 4 
- Componentes | shadcn/ui + Radix UI 
- HTTP client  Axios 
- Iconos  Lucide React 
+| Utilidad |  Tecnología |
+|------|------------|
+| Framework UI | <img src="https://cdn.simpleicons.org/react/61DAFB" width="14" height="14"/> React 19 |
+| Routing | <img src="https://cdn.simpleicons.org/reactrouter/CA4245" width="14" height="14"/> React Router DOM 7 |
+| Build tool | <img src="https://cdn.simpleicons.org/vite/646CFF" width="14" height="14"/> Vite 7 + SWC |
+| Estilos | <img src="https://cdn.simpleicons.org/tailwindcss/06B6D4" width="14" height="14"/> Tailwind CSS 4 |
+| Componentes | <img src="https://cdn.simpleicons.org/shadcnui/000000" width="14" height="14"/> shadcn/ui + Radix UI |
+| HTTP client | <img src="https://cdn.simpleicons.org/axios/5A29E4" width="14" height="14"/> Axios |
+| Iconos | <img src="https://cdn.simpleicons.org/lucide/F56565" width="14" height="14"/> Lucide React |
 
 ---
 
@@ -50,24 +49,23 @@ Sin dinero de por medio. Sin plataformas frías. Solo personas ayudando a person
 
 ### Requisitos previos
 
-- Node.js 18 o superior
-- El backend [DikeBack](../DikeBack) corriendo en `localhost:3001`
+
 
 ### Pasos
 
 ```bash
 # 1. Clona el repositorio
-
-
+git clone https://github.com/tu-usuario/dike-frontend.git
+cd dike-frontend
 
 # 2. Instala las dependencias
-
+npm install
 
 # 3. Inicia el servidor de desarrollo
-
+npm run dev
 ```
 
-`.
+La app estará disponible en `http://localhost:5173`.
 
 ### Arrancar frontend + backend a la vez
 
@@ -96,11 +94,19 @@ src/
 
 ---
 
+## Scripts disponibles
 
+| Comando | Descripción |
+|---------|-------------|
+| `npm run dev` | Servidor de desarrollo (Vite) |
+| `npm run dev-start` | Frontend + backend en paralelo |
+
+
+---
 
 ## ¿Quieres contribuir?
 
-
+Las contribuciones son bienvenidas. Si encuentras un bug o tienes una idea, abre un issue primero para discutirlo antes de enviar un pull request.
 
 1. Haz un fork del repositorio
 2. Crea tu rama: `git checkout -b feature/mi-mejora`
