@@ -1,12 +1,12 @@
-# Dike — Comparte · Presta · Dona
+# Dikë — Comparte · Presta · Dona
 
-> Una plataforma comunitaria para dar una segunda vida a los objetos que ya no usas.
+Una plataforma comunitaria para dar una segunda vida a los objetos que ya no usas.
 
 ---
 
-## ¿Qué es Dike?
+## ¿Qué es Dikë?
 
-Dike nació con una idea simple: los objetos que acumulan polvo en tu casa pueden ser exactamente lo que alguien más necesita. En lugar de comprar y tirar, ¿por qué no compartir?
+Dikë nació con una idea simple: los objetos que acumulan polvo en tu casa pueden ser exactamente lo que alguien más necesita. En lugar de comprar y tirar, ¿por qué no compartir?
 
 Es una aplicación pensada para comunidades reales — vecinos, amigos, compañeros de trabajo — donde cualquiera puede publicar lo que tiene, pedir lo que necesita, y construir relaciones de confianza alrededor del intercambio.
 
@@ -53,17 +53,6 @@ Sin dinero de por medio. Sin plataformas frías. Solo personas ayudando a person
 
 ### Pasos
 
-```bash
-# 1. Clona el repositorio
-git clone https://github.com/tu-usuario/dike-frontend.git
-cd dike-frontend
-
-# 2. Instala las dependencias
-npm install
-
-# 3. Inicia el servidor de desarrollo
-npm run dev
-```
 
 La app estará disponible en `http://localhost:5173`.
 
@@ -98,7 +87,7 @@ src/
 
 | Comando | Descripción |
 |---------|-------------|
-| `npm run dev` | Servidor de desarrollo (Vite) |
+| `npm run dev` | Servidor de desarrollo |
 | `npm run dev-start` | Frontend + backend en paralelo |
 
 
