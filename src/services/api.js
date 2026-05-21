@@ -41,4 +41,13 @@ export const createRating = (data) => api.post('/ratings', data)
 export const getCategories = () => api.get('/categories')
 export const getTags = () => api.get('/tags')
 
+// Admin
+export const adminGetUsers = () => api.get('/admin/users')
+export const adminUpdateUser = (id, data) => api.put(`/admin/users/${id}`, data)
+export const adminDeleteUser = (id) => api.delete(`/admin/users/${id}`)
+
+export const adminGetPosts = (params) => api.get('/admin/posts', { params })
+export const adminUpdatePost = (id, data) => api.put(`/admin/posts/${id}`, data)
+export const adminDeletePost = (id) => api.delete(`/admin/posts/${id}`)
+
 export default api
