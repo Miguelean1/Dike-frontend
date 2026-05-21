@@ -8,7 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { User, LogOut, Plus, MessageSquare, ClipboardList } from 'lucide-react'
+import { User, LogOut, Plus, MessageSquare, ClipboardList, ShieldCheck } from 'lucide-react'
 import Logo from '@/components/Logo'
 
 export default function Navbar() {
@@ -89,6 +89,20 @@ export default function Navbar() {
                       Mis solicitudes
                     </Link>
                   </DropdownMenuItem>
+                  {user.role === 'admin' && (
+                    <>
+                      <DropdownMenuSeparator className="bg-stone-800" />
+                      <DropdownMenuItem asChild>
+                        <Link
+                          to="/admin"
+                          className="flex items-center gap-2 cursor-pointer focus:bg-neutral-800 focus:text-stone-100"
+                        >
+                          <ShieldCheck size={14} />
+                          Panel admin
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator className="bg-stone-800" />
                   <DropdownMenuItem
                     onClick={handleLogout}

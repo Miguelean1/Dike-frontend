@@ -7,6 +7,8 @@ import Feed from '@/pages/Feed'
 import DetailCard from '@/pages/DetailCard'
 import CreatePost from '@/pages/CreatePost'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import AdminRoute from '@/components/AdminRoute'
+import AdminPanel from '@/pages/AdminPanel'
 import UserProfile from '@/pages/UserProfile'
 import MyRequests from '@/pages/MyRequests'
 import Messages from '@/pages/Messages'
@@ -37,6 +39,10 @@ export const router = createBrowserRouter([
       {
         path: '/mensajes/:userId',
         element: <ProtectedRoute><Chat /></ProtectedRoute>,
+      },
+      {
+        path: '/admin',
+        element: <AdminRoute><AdminPanel /></AdminRoute>,
       },
     ],
   },
