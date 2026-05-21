@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "dev-start": "concurrently \"node ../DikeBack/index.js\" \"vite\"",
+    "dev-start": "concurrently \"node ../../DikeBack/index.js\" \"vite\"",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview"
