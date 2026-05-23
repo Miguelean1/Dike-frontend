@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import Swal from 'sweetalert2'
 import { adminGetUsers, adminUpdateUser, adminDeleteUser, adminGetPosts, adminUpdatePost, adminDeletePost } from '@/services/api'
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
@@ -24,9 +25,20 @@ export default function AdminPanel() {
   }
 
   async function handleDeleteUser(id) {
-    if (!confirm('¿Eliminar este usuario?')) return
+    const result = await Swal.fire({
+      title: '¿Eliminar usuario?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1c1917',
+      cancelButtonColor: '#a8a29e',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+    })
+    if (!result.isConfirmed) return
     await adminDeleteUser(id)
     setUsers((prev) => prev.filter((u) => u.id !== id))
+    Swal.fire({ title: 'Eliminado', icon: 'success', timer: 1500, showConfirmButton: false })
   }
 
   async function handleSaveUser(id) {
@@ -36,9 +48,20 @@ export default function AdminPanel() {
   }
 
   async function handleDeletePost(id) {
-    if (!confirm('¿Eliminar este anuncio?')) return
+    const result = await Swal.fire({
+      title: '¿Eliminar anuncio?',
+      text: 'Esta acción no se puede deshacer.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#1c1917',
+      cancelButtonColor: '#a8a29e',
+      confirmButtonText: 'Eliminar',
+      cancelButtonText: 'Cancelar',
+    })
+    if (!result.isConfirmed) return
     await adminDeletePost(id)
     setPosts((prev) => prev.filter((p) => p.id !== id))
+    Swal.fire({ title: 'Eliminado', icon: 'success', timer: 1500, showConfirmButton: false })
   }
 
   async function handleSavePost(id) {

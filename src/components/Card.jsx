@@ -1,4 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom'
+import Swal from 'sweetalert2'
 import { Badge } from '@/components/ui/badge'
 
 const TYPE_LABELS = {
@@ -69,7 +70,7 @@ export default function Card({ anuncio }) {
           </Link>
           <button
             type="button"
-            onClick={() => alert('Función de contacto en construcción.')}
+            onClick={() => Swal.fire({ title: 'Próximamente', text: 'La función de contacto está en construcción.', icon: 'info', confirmButtonColor: '#1c1917' })}
             className="flex-1 text-center text-xs uppercase tracking-widest font-bold border border-stone-400 text-stone-600 py-2 hover:border-stone-900 hover:text-stone-900 transition-colors"
           >
             Contactar
