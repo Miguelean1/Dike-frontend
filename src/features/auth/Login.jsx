@@ -35,7 +35,7 @@ export default function Login() {
 
         <div className="border-t-4 border-b border-stone-900 pb-4 mb-8">
           <Link to="/" className="flex justify-center">
-            <Logo className="h-12" />
+            <Logo className="h-20" />
           </Link>
           <p className="text-center text-stone-500 text-xs tracking-[0.25em] uppercase mt-2">
             Acceso a la plataforma
