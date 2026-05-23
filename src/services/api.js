@@ -24,6 +24,7 @@ export const getPosts = (params) => api.get('/posts', { params })
 export const getPost = (id) => api.get(`/posts/${id}`)
 export const createPost = (data) => api.post('/posts', data)
 export const updatePost = (id, data) => api.put(`/posts/${id}`, data)
+export const updatePostStatus = (id, status) => api.patch(`/posts/${id}/status`, { status })
 export const deletePost = (id) => api.delete(`/posts/${id}`)
 
 export const getRequests = (type) => api.get('/requests', { params: { type } })

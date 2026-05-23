@@ -23,7 +23,7 @@ export default function Feed() {
     async function load() {
       try {
         setStatus({ loading: true, error: '' })
-        const params = { status: 'active' }
+        const params = { status: 'available' }
         if (typeFilter) params.type = typeFilter
         const { data } = await getPosts(params)
         if (!cancelled) setItems(Array.isArray(data) ? data : [])

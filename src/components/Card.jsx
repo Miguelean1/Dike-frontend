@@ -8,10 +8,17 @@ const TYPE_LABELS = {
   exchange: 'Intercambio',
 }
 
+const STATUS_CONFIG = {
+  available: { label: 'Disponible', className: 'border-emerald-500 text-emerald-700 bg-emerald-50' },
+  borrowed:  { label: 'Prestado',   className: 'border-orange-400 text-orange-700 bg-orange-50' },
+  reserved:  { label: 'Reservado',  className: 'border-amber-400 text-amber-700 bg-amber-50' },
+}
+
 export default function Card({ anuncio }) {
   const navigate = useNavigate()
 
-  const { id, title = 'Sin título', description = '', image, type } = anuncio ?? {}
+  const { id, title = 'Sin título', description = '', image, type, status } = anuncio ?? {}
+  const statusCfg = STATUS_CONFIG[status]
 
   return (
     <article className="bg-white border border-stone-300 hover:border-stone-500 transition-colors overflow-hidden group">
@@ -22,7 +29,7 @@ export default function Card({ anuncio }) {
         className="block w-full text-left"
         aria-label={`Ver ${title}`}
       >
-        <div className="w-full h-48 bg-stone-100 overflow-hidden">
+        <div className="w-full h-48 bg-stone-100 overflow-hidden relative">
           {image ? (
             <img
               src={image}
@@ -34,6 +41,11 @@ export default function Card({ anuncio }) {
             <div className="w-full h-full flex items-center justify-center text-stone-400 text-xs uppercase tracking-widest">
               Sin imagen
             </div>
+          )}
+          {statusCfg && status !== 'available' && (
+            <span className={`absolute top-2 right-2 text-[10px] uppercase tracking-wider border px-2 py-0.5 font-medium ${statusCfg.className}`}>
+              {statusCfg.label}
+            </span>
           )}
         </div>
       </button>

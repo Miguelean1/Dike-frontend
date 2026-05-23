@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useParams, Link, useNavigate } from 'react-router-dom'
-import { getPost, createRequest } from '@/services/api'
+import { getPost, createRequest, updatePostStatus } from '@/services/api'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -9,6 +9,12 @@ const TYPE_LABELS = {
   donation: 'Donación',
   loan: 'Préstamo',
   exchange: 'Intercambio',
+}
+
+const STATUS_CONFIG = {
+  available: { label: 'Disponible', className: 'border-emerald-500 text-emerald-700 bg-emerald-50' },
+  borrowed:  { label: 'Prestado',   className: 'border-orange-400 text-orange-700 bg-orange-50' },
+  reserved:  { label: 'Reservado',  className: 'border-amber-400 text-amber-700 bg-amber-50' },
 }
 
 export default function DetailCard() {
@@ -26,6 +32,8 @@ export default function DetailCard() {
   const [submitting, setSubmitting] = useState(false)
   const [requestError, setRequestError] = useState('')
   const [requestSent, setRequestSent] = useState(false)
+
+  const [statusUpdating, setStatusUpdating] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -60,6 +68,16 @@ export default function DetailCard() {
     }
   }
 
+  const handleStatusChange = async (newStatus) => {
+    setStatusUpdating(true)
+    try {
+      await updatePostStatus(post.id, newStatus)
+      setPost((p) => ({ ...p, status: newStatus }))
+    } finally {
+      setStatusUpdating(false)
+    }
+  }
+
   if (loading) {
     return (
       <div className="min-h-full flex items-center justify-center">
@@ -84,6 +102,7 @@ export default function DetailCard() {
 
   const { title, description, category, image, type, status, creation_date, author, tags = [] } = post
   const isOwn = user?.id === author?.id
+  const statusCfg = STATUS_CONFIG[status]
 
   return (
     <div className="min-h-full bg-transparent">
@@ -136,9 +155,13 @@ export default function DetailCard() {
               )}
 
               <div className="border-t border-stone-200 pt-4 space-y-2 text-xs mb-6">
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span className="text-stone-500 uppercase tracking-widest">Estado</span>
-                  <span className="text-stone-900 font-medium capitalize">{status}</span>
+                  {statusCfg && (
+                    <span className={`text-[10px] uppercase tracking-wider border px-2 py-0.5 font-medium ${statusCfg.className}`}>
+                      {statusCfg.label}
+                    </span>
+                  )}
                 </div>
                 {creation_date && (
                   <div className="flex justify-between">
@@ -148,18 +171,37 @@ export default function DetailCard() {
                 )}
               </div>
 
+              {/* Owner status controls */}
+              {isOwn && (
+                <div className="border border-stone-200 p-3 mb-4 space-y-2">
+                  <p className="text-xs uppercase tracking-widest text-stone-500">Cambiar estado</p>
+                  <div className="flex gap-2 flex-wrap">
+                    {(['available', 'borrowed', 'reserved']).map((s) => (
+                      <button
+                        key={s}
+                        disabled={status === s || statusUpdating}
+                        onClick={() => handleStatusChange(s)}
+                        className={`text-[10px] uppercase tracking-wider border px-3 py-1.5 transition-colors disabled:opacity-40 disabled:cursor-default ${
+                          status === s
+                            ? `${STATUS_CONFIG[s].className} cursor-default`
+                            : 'border-stone-300 text-stone-500 hover:border-stone-700 hover:text-stone-900'
+                        }`}
+                      >
+                        {STATUS_CONFIG[s].label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {requestSent && (
                 <div className="border border-stone-300 bg-stone-50 px-4 py-3 text-stone-700 text-xs text-center mb-4">
                   Solicitud enviada correctamente.
                 </div>
               )}
 
-              {!requestSent && status === 'active' && (
-                isOwn ? (
-                  <p className="text-xs text-center text-stone-400 uppercase tracking-widest py-3 border border-stone-200">
-                    Es tu anuncio
-                  </p>
-                ) : !user ? (
+              {!isOwn && !requestSent && status === 'available' && (
+                !user ? (
                   <Link
                     to="/login"
                     className="block w-full text-center text-xs uppercase tracking-widest font-bold bg-stone-900 text-stone-100 py-3 hover:bg-stone-800 transition-colors"
@@ -215,6 +257,12 @@ export default function DetailCard() {
                     </div>
                   </form>
                 )
+              )}
+
+              {!isOwn && !requestSent && status !== 'available' && (
+                <div className={`text-xs text-center px-4 py-3 border font-medium uppercase tracking-widest ${statusCfg?.className}`}>
+                  Este anuncio no está disponible
+                </div>
               )}
             </div>
 
