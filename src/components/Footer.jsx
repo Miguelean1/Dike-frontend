@@ -15,11 +15,20 @@ export default function Footer() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!email) return
-    setSent(true)
-    setEmail('')
+    try {
+      await fetch('http://localhost:3001/api/newsletter/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+      setSent(true)
+      setEmail('')
+    } catch {
+      setSent(true)
+    }
   }
 
   return (
