@@ -16,6 +16,9 @@ api.interceptors.request.use((config) => {
 
 export const register = (data) => api.post('/auth/register', data)
 export const login = (data) => api.post('/auth/login', data)
+export const verifyEmail = (token) => api.get(`/auth/verify-email/${token}`)
+export const forgotPassword = (email) => api.post('/auth/forgot-password', { email })
+export const resetPassword = (token, password) => api.post('/auth/reset-password', { token, password })
 
 export const getUser = (id) => api.get(`/users/${id}`)
 export const updateUser = (id, data) => api.put(`/users/${id}`, data)

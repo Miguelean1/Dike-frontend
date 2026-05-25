@@ -2,6 +2,9 @@ import { createBrowserRouter } from 'react-router-dom'
 import Landing from '@/features/auth/Landing'
 import Login from '@/features/auth/Login'
 import Register from '@/features/auth/Register'
+import ForgotPassword from '@/features/auth/ForgotPassword'
+import ResetPassword from '@/features/auth/ResetPassword'
+import VerifyEmail from '@/features/auth/VerifyEmail'
 import MainLayout from '@/layouts/MainLayout'
 import Feed from '@/pages/Feed'
 import DetailCard from '@/pages/DetailCard'
@@ -18,6 +21,9 @@ export const router = createBrowserRouter([
   { path: '/', element: <Landing /> },
   { path: '/login', element: <Login /> },
   { path: '/register', element: <Register /> },
+  { path: '/verificar-email', element: <VerifyEmail /> },
+  { path: '/forgot-password', element: <ForgotPassword /> },
+  { path: '/reset-password', element: <ResetPassword /> },
   {
     element: <MainLayout />,
     children: [

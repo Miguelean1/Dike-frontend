@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import Card from '@/components/Card'
 import { Input } from '@/components/ui/input'
-import { Search } from 'lucide-react'
+import { Search, ChevronLeft, ChevronRight } from 'lucide-react'
 import { getPosts } from '@/services/api'
 
 const TYPE_FILTERS = [
@@ -11,10 +11,15 @@ const TYPE_FILTERS = [
   { value: 'exchange', label: 'Intercambios' },
 ]
 
+const LIMIT = 12
+
 export default function Feed() {
   const [query, setQuery] = useState('')
   const [typeFilter, setTypeFilter] = useState(null)
   const [items, setItems] = useState([])
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [total, setTotal] = useState(0)
   const [status, setStatus] = useState({ loading: true, error: '' })
 
   useEffect(() => {
@@ -23,10 +28,14 @@ export default function Feed() {
     async function load() {
       try {
         setStatus({ loading: true, error: '' })
-        const params = { status: 'available' }
+        const params = { status: 'available', page, limit: LIMIT }
         if (typeFilter) params.type = typeFilter
         const { data } = await getPosts(params)
-        if (!cancelled) setItems(Array.isArray(data) ? data : [])
+        if (!cancelled) {
+          setItems(Array.isArray(data.posts) ? data.posts : [])
+          setTotalPages(data.totalPages ?? 1)
+          setTotal(data.total ?? 0)
+        }
       } catch (e) {
         if (!cancelled) setStatus({ loading: false, error: e.message ?? 'Error al cargar los anuncios' })
         return
@@ -37,7 +46,12 @@ export default function Feed() {
 
     load()
     return () => { cancelled = true }
-  }, [typeFilter])
+  }, [typeFilter, page])
+
+  const handleTypeFilter = (value) => {
+    setTypeFilter(value)
+    setPage(1)
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase()
@@ -78,7 +92,7 @@ export default function Feed() {
             {TYPE_FILTERS.map(({ value, label }) => (
               <button
                 key={label}
-                onClick={() => setTypeFilter(value)}
+                onClick={() => handleTypeFilter(value)}
                 className={`text-xs uppercase tracking-widest px-3 py-1.5 border transition-colors ${
                   typeFilter === value
                     ? 'bg-stone-900 text-stone-100 border-stone-900'
@@ -116,6 +130,33 @@ export default function Feed() {
             ))}
           </div>
         )}
+
+        {!status.loading && !status.error && totalPages > 1 && (
+          <div className="flex items-center justify-between mt-10 border-t border-stone-300 pt-6">
+            <p className="text-xs text-stone-500 uppercase tracking-widest">
+              {total} anuncios · página {page} de {totalPages}
+            </p>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={page === 1}
+                className="flex items-center gap-1 text-xs uppercase tracking-widest px-3 py-1.5 border border-stone-400 text-stone-600 hover:border-stone-900 hover:text-stone-900 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                <ChevronLeft size={13} />
+                Anterior
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                disabled={page === totalPages}
+                className="flex items-center gap-1 text-xs uppercase tracking-widest px-3 py-1.5 border border-stone-400 text-stone-600 hover:border-stone-900 hover:text-stone-900 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                Siguiente
+                <ChevronRight size={13} />
+              </button>
+            </div>
+          </div>
+        )}
+
       </div>
     </div>
   )

@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
-import { useAuth } from '@/context/AuthContext'
+import { Link } from 'react-router-dom'
+import { register as apiRegister } from '@/services/api'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
@@ -13,9 +13,7 @@ export default function Register() {
   const [confirm, setConfirm] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-
-  const { register } = useAuth()
-  const navigate = useNavigate()
+  const [done, setDone] = useState(false)
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -32,13 +30,38 @@ export default function Register() {
 
     setLoading(true)
     try {
-      await register(email, password, username)
-      navigate('/feed')
+      await apiRegister({ email, password, username })
+      setDone(true)
     } catch (err) {
       setError(err.response?.data?.error || 'Error al crear la cuenta')
     } finally {
       setLoading(false)
     }
+  }
+
+  if (done) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-transparent px-4">
+        <div className="w-full max-w-sm space-y-6">
+          <div className="border-t-4 border-b border-stone-900 pb-4">
+            <Link to="/" className="flex justify-center">
+              <Logo className="h-12" />
+            </Link>
+          </div>
+          <div className="border border-stone-300 bg-stone-50 px-5 py-5 space-y-2">
+            <p className="text-stone-800 text-sm font-bold uppercase tracking-widest">Revisa tu correo</p>
+            <p className="text-stone-500 text-xs leading-relaxed">
+              Hemos enviado un enlace de verificación a <span className="font-bold text-stone-700">{email}</span>. Haz clic en él para activar tu cuenta.
+            </p>
+          </div>
+          <div className="text-center">
+            <Link to="/login" className="text-xs uppercase tracking-widest text-stone-600 hover:text-stone-900 underline">
+              Ya lo tengo, ir al acceso
+            </Link>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   return (

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useParams, Link } from 'react-router-dom'
-import { getUser, getUserRatings, updateUser } from '@/services/api'
+import { getUser, getUserRatings, updateUser, createRating } from '@/services/api'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
@@ -26,6 +26,17 @@ export default function UserProfile() {
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState('')
   const fileRef = useRef(null)
+
+  const [ratingScore, setRatingScore] = useState(0)
+  const [ratingHover, setRatingHover] = useState(0)
+  const [ratingComment, setRatingComment] = useState('')
+  const [ratingSubmitting, setRatingSubmitting] = useState(false)
+  const [ratingError, setRatingError] = useState('')
+  const [ratingSuccess, setRatingSuccess] = useState(false)
+
+  const alreadyRated = authUser
+    ? ratings.some((r) => r.rating_user_id === authUser.id)
+    : false
 
   useEffect(() => {
     let cancelled = false
@@ -90,6 +101,25 @@ export default function UserProfile() {
       setSaveError(err.response?.data?.error || 'Error al guardar los cambios.')
     } finally {
       setSaving(false)
+    }
+  }
+
+  const handleSubmitRating = async (e) => {
+    e.preventDefault()
+    if (ratingScore === 0) return setRatingError('Selecciona una puntuación.')
+    setRatingError('')
+    setRatingSubmitting(true)
+    try {
+      await createRating({ rated_user_id: Number(id), score: ratingScore, comment: ratingComment })
+      const { data } = await getUserRatings(id)
+      setRatings(data)
+      setRatingScore(0)
+      setRatingComment('')
+      setRatingSuccess(true)
+    } catch (err) {
+      setRatingError(err.response?.data?.error || 'Error al enviar la valoración.')
+    } finally {
+      setRatingSubmitting(false)
     }
   }
 
@@ -251,6 +281,74 @@ export default function UserProfile() {
                   </button>
                 </div>
               </form>
+            )}
+
+            {!isOwn && authUser && !alreadyRated && !ratingSuccess && (
+              <form onSubmit={handleSubmitRating} className="border border-stone-300 bg-white p-6 space-y-4">
+                <p className="text-xs uppercase tracking-widest text-stone-500 font-bold border-b border-stone-200 pb-3">
+                  Dejar valoración
+                </p>
+
+                <div className="space-y-1.5">
+                  <Label className="text-stone-700 text-xs tracking-widest uppercase">Puntuación</Label>
+                  <div className="flex gap-1">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setRatingScore(star)}
+                        onMouseEnter={() => setRatingHover(star)}
+                        onMouseLeave={() => setRatingHover(0)}
+                        className="focus:outline-none"
+                      >
+                        <Star
+                          size={22}
+                          className={
+                            star <= (ratingHover || ratingScore)
+                              ? 'fill-stone-800 text-stone-800'
+                              : 'text-stone-300'
+                          }
+                        />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="space-y-1.5">
+                  <Label className="text-stone-700 text-xs tracking-widest uppercase">Comentario (opcional)</Label>
+                  <textarea
+                    value={ratingComment}
+                    onChange={(e) => setRatingComment(e.target.value)}
+                    rows={2}
+                    placeholder="Cuéntanos tu experiencia..."
+                    className="w-full bg-white border border-stone-300 text-stone-900 text-sm px-3 py-2 placeholder:text-stone-400 focus:outline-none focus:ring-2 focus:ring-stone-500 resize-none"
+                  />
+                </div>
+
+                {ratingError && (
+                  <p className="text-xs text-red-700 border border-red-300 bg-red-50 px-3 py-2">{ratingError}</p>
+                )}
+
+                <Button
+                  type="submit"
+                  disabled={ratingSubmitting || ratingScore === 0}
+                  className="bg-stone-900 text-stone-100 hover:bg-stone-800 font-bold tracking-widest uppercase text-xs rounded-none cursor-pointer"
+                >
+                  {ratingSubmitting ? 'Enviando...' : 'Enviar valoración'}
+                </Button>
+              </form>
+            )}
+
+            {ratingSuccess && (
+              <div className="border border-stone-300 bg-white px-6 py-4">
+                <p className="text-xs text-stone-700 uppercase tracking-widest">Valoración enviada. ¡Gracias!</p>
+              </div>
+            )}
+
+            {alreadyRated && !ratingSuccess && (
+              <div className="border border-stone-200 bg-stone-50 px-6 py-4">
+                <p className="text-xs text-stone-500 uppercase tracking-widest">Ya has valorado a este usuario.</p>
+              </div>
             )}
 
             <div className="border border-stone-300 bg-white p-6">
