@@ -25,7 +25,7 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 h-14 flex items-center justify-between gap-4">
 
         <Link to="/feed" className="shrink-0">
-          <Logo className="h-14" />
+        <Logo className="h-14" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-6">
