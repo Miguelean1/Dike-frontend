@@ -53,10 +53,22 @@ Sin dinero de por medio. Sin plataformas frías. Solo personas ayudando a person
 
 ### Requisitos previos
 
-
+- Node.js >= 18
+- El backend [Dike-backend](https://github.com/Miguelean1/Dike-backend) corriendo en `http://localhost:3002`
 
 ### Pasos
 
+```bash
+# 1. Clonar el repositorio
+git clone https://github.com/Miguelean1/Dike-frontend
+cd Dike-frontend
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Iniciar el servidor de desarrollo
+npm run dev
+```
 
 La app estará disponible en `http://localhost:5173`.
 
@@ -69,6 +81,21 @@ npm run dev-start
 ```
 
 Este comando levanta ambos servidores en paralelo con `concurrently`.
+
+### Arrancar por separado
+
+Si prefieres levantar cada servidor en su propia terminal:
+
+```bash
+# Terminal 1 — backend
+cd ../DikeBack
+npm run dev
+
+# Terminal 2 — frontend
+npm run dev
+```
+
+El backend estará disponible en `http://localhost:3002` y el frontend en `http://localhost:5173`.
 
 ---
 
@@ -93,6 +120,8 @@ src/
 |---------|-------------|
 | `npm run dev` | Servidor de desarrollo |
 | `npm run dev-start` | Frontend + backend en paralelo |
+| `npm test` | Ejecuta los tests con cobertura |
+| `npm run test:watch` | Tests en modo watch |
 
 
 ---

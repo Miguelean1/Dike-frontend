@@ -83,6 +83,7 @@ export default function Feed() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Buscar anuncios..."
+                aria-label="Buscar anuncios"
                 className="pl-8 bg-white border-stone-300 text-stone-900 placeholder:text-stone-400 focus-visible:ring-stone-500 rounded-none"
               />
             </div>

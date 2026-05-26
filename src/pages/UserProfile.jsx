@@ -310,6 +310,7 @@ export default function UserProfile() {
                       <button
                         key={star}
                         type="button"
+                        aria-label={`Puntuar con ${star} estrella${star > 1 ? 's' : ''}`}
                         onClick={() => setRatingScore(star)}
                         onMouseEnter={() => setRatingHover(star)}
                         onMouseLeave={() => setRatingHover(0)}
@@ -393,6 +394,7 @@ export default function UserProfile() {
                       {isOwn && (
                         <button
                           onClick={() => handleDeletePost(post.id)}
+                          aria-label={`Eliminar anuncio ${post.title}`}
                           className="ml-4 flex-shrink-0 text-stone-400 hover:text-red-600 transition-colors p-1"
                         >
                           <Trash2 size={15} />

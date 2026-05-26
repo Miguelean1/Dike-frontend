@@ -217,7 +217,9 @@ export default function DetailCard() {
                   </button>
                 ) : (
                   <form onSubmit={handleRequest} className="space-y-3 border-t border-stone-200 pt-4">
+                    <label htmlFor="request-message" className="sr-only">Mensaje para el dueño</label>
                     <textarea
+                      id="request-message"
                       value={message}
                       onChange={(e) => setMessage(e.target.value)}
                       placeholder="Mensaje para el dueño (opcional)"
