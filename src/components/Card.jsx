@@ -1,6 +1,6 @@
 import { Link, useNavigate } from 'react-router-dom'
-import Swal from 'sweetalert2'
 import { Badge } from '@/components/ui/badge'
+import { useAuth } from '@/context/AuthContext'
 
 const TYPE_LABELS = {
   donation: 'Donación',
@@ -16,12 +16,13 @@ const STATUS_CONFIG = {
 
 export default function Card({ anuncio }) {
   const navigate = useNavigate()
+  const { user } = useAuth()
 
-  const { id, title = 'Sin título', description = '', image, type, status } = anuncio ?? {}
+  const { id, title = 'Sin título', description = '', image, type, status, author } = anuncio ?? {}
   const statusCfg = STATUS_CONFIG[status]
 
   return (
-    <article className="bg-white border border-stone-300 hover:border-stone-500 transition-colors overflow-hidden group">
+    <article className="bg-white border-2 border-stone-300 hover:border-red-600 transition-colors overflow-hidden group rounded-lg">
 
       <button
         type="button"
@@ -80,13 +81,15 @@ export default function Card({ anuncio }) {
           >
             Ver
           </Link>
-          <button
-            type="button"
-            onClick={() => Swal.fire({ title: 'Próximamente', text: 'La función de contacto está en construcción.', icon: 'info', confirmButtonColor: '#1c1917' })}
-            className="flex-1 text-center text-xs uppercase tracking-widest font-bold border border-stone-400 text-stone-600 py-2 hover:border-stone-900 hover:text-stone-900 transition-colors"
-          >
-            Contactar
-          </button>
+          {author && user?.id !== author.id && (
+            <button
+              type="button"
+              onClick={() => user ? navigate(`/mensajes/${author.id}`) : navigate('/login')}
+              className="flex-1 text-center text-xs uppercase tracking-widest font-bold border border-stone-400 text-stone-600 py-2 hover:border-stone-900 hover:text-stone-900 transition-colors"
+            >
+              Contactar
+            </button>
+          )}
         </div>
       </div>
     </article>
