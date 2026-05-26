@@ -109,7 +109,7 @@ describe('UserProfile', () => {
 
     await waitFor(() => expect(screen.getByText(/dejar valoración/i)).toBeInTheDocument())
 
-    const stars = screen.getAllByRole('button', { name: '' })
+    const stars = screen.getAllByRole('button', { name: /puntuar con/i })
     await userEvent.click(stars[4])
 
     await userEvent.click(screen.getByRole('button', { name: /enviar valoración/i }))
