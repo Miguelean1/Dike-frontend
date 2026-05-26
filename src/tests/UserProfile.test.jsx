@@ -8,6 +8,7 @@ const mockUseAuth = vi.fn()
 const mockGetUser = vi.fn()
 const mockGetUserRatings = vi.fn()
 const mockCreateRating = vi.fn()
+const mockGetUserPosts = vi.fn()
 
 vi.mock('react-router-dom', async () => {
   const actual = await vi.importActual('react-router-dom')
@@ -22,6 +23,7 @@ vi.mock('@/services/api', () => ({
   getUser: (...args) => mockGetUser(...args),
   getUserRatings: (...args) => mockGetUserRatings(...args),
   createRating: (...args) => mockCreateRating(...args),
+  getUserPosts: (...args) => mockGetUserPosts(...args),
   updateUser: vi.fn(),
 }))
 
@@ -38,11 +40,13 @@ describe('UserProfile', () => {
     asOtherUser()
     mockGetUser.mockResolvedValue({ data: mockProfile })
     mockGetUserRatings.mockResolvedValue({ data: [] })
+    mockGetUserPosts.mockResolvedValue({ data: [] })
   })
 
   it('shows loading state initially', () => {
     mockGetUser.mockImplementation(() => new Promise(() => {}))
     mockGetUserRatings.mockImplementation(() => new Promise(() => {}))
+    mockGetUserPosts.mockImplementation(() => new Promise(() => {}))
     renderPage()
     expect(screen.getByText(/cargando/i)).toBeInTheDocument()
   })

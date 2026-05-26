@@ -8,30 +8,31 @@ vi.mock('react-router-dom', async () => {
   return { ...actual, useNavigate: () => vi.fn() }
 })
 
-vi.mock('sweetalert2', () => ({
-  default: { fire: vi.fn() },
+vi.mock('@/context/AuthContext', () => ({
+  useAuth: () => ({ user: { id: 99 } }),
 }))
 
+const author = { id: 1, username: 'OtherUser' }
 const renderCard = (anuncio) => render(<Card anuncio={anuncio} />, { wrapper: MemoryRouter })
 
 describe('Card', () => {
   it('renders the post title', () => {
-    renderCard({ id: 1, title: 'Mi bicicleta', description: 'En buen estado', type: 'loan', status: 'available' })
+    renderCard({ id: 1, title: 'Mi bicicleta', description: 'En buen estado', type: 'loan', status: 'available', author })
     expect(screen.getByText('Mi bicicleta')).toBeInTheDocument()
   })
 
   it('shows "Sin imagen" when no image is provided', () => {
-    renderCard({ id: 1, title: 'Test', description: '', type: 'donation', status: 'available' })
+    renderCard({ id: 1, title: 'Test', description: '', type: 'donation', status: 'available', author })
     expect(screen.getByText('Sin imagen')).toBeInTheDocument()
   })
 
   it('renders an img element when image is provided', () => {
-    renderCard({ id: 1, title: 'Test', image: 'http://example.com/img.jpg', type: 'exchange', status: 'available' })
+    renderCard({ id: 1, title: 'Test', image: 'http://example.com/img.jpg', type: 'exchange', status: 'available', author })
     expect(screen.getByRole('img', { name: 'Test' })).toBeInTheDocument()
   })
 
   it('shows "Ver" and "Contactar" action buttons', () => {
-    renderCard({ id: 1, title: 'Test', description: '', type: 'loan', status: 'available' })
+    renderCard({ id: 1, title: 'Test', description: '', type: 'loan', status: 'available', author })
     expect(screen.getByRole('link', { name: /ver/i })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /contactar/i })).toBeInTheDocument()
   })
