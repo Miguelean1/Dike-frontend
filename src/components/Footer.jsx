@@ -5,10 +5,10 @@ import { FaXTwitter } from 'react-icons/fa6'
 import Logo from '@/components/Logo'
 
 const socials = [
-  { icon: FaInstagram, label: 'Instagram', href: '#' },
-  { icon: FaFacebookF, label: 'Facebook', href: '#' },
-  { icon: FaYoutube, label: 'YouTube', href: '#' },
-  { icon: FaXTwitter, label: 'Twitter / X', href: '#' },
+  { icon: FaInstagram, label: 'Instagram', href: 'https://www.instagram.com' },
+  { icon: FaFacebookF, label: 'Facebook', href: 'https://www.facebook.com' },
+  { icon: FaYoutube, label: 'YouTube', href: 'https://www.youtube.com' },
+  { icon: FaXTwitter, label: 'Twitter / X', href: 'https://www.x.com' },
 ]
 
 export default function Footer() {
@@ -19,7 +19,7 @@ export default function Footer() {
     e.preventDefault()
     if (!email) return
     try {
-      await fetch('http://localhost:3001/api/newsletter/subscribe', {
+      await fetch('http://localhost:3002/api/newsletter/subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
@@ -32,16 +32,17 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-neutral-950 border-t border-stone-800 mt-auto">
+    <footer className="bg-stone-800 border-t border-stone-700 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
 
-        {/* Columna izquierda — redes sociales */}
         <div className="flex flex-col gap-3">
           {socials.map(({ icon: Icon, label, href }) => (
             <a
               key={label}
               href={href}
               aria-label={label}
+              target="_blank"
+              rel="noopener noreferrer"
               className="flex items-center gap-3 text-stone-500 hover:text-stone-300 transition-colors w-fit"
             >
               <Icon size={18} />
@@ -50,7 +51,6 @@ export default function Footer() {
           ))}
         </div>
 
-        {/* Centro — mensaje */}
         <div className="flex flex-col items-center justify-center text-center gap-2">
           <Logo className="h-18" />
           <p className="text-stone-600 text-xs tracking-wide">
@@ -66,7 +66,6 @@ export default function Footer() {
           </nav>
         </div>
 
-        {/* Columna derecha — suscripción por correo */}
         <div className="border border-stone-800 p-4 flex flex-col gap-3">
           <p className="text-stone-300 text-xs font-semibold uppercase tracking-widest">
             Recibe recomendaciones

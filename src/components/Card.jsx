@@ -22,7 +22,7 @@ export default function Card({ anuncio }) {
   const statusCfg = STATUS_CONFIG[status]
 
   return (
-    <article className="bg-white border-2 border-stone-300 hover:border-red-600 transition-colors overflow-hidden group rounded-lg">
+    <article className="bg-white border-2 border-stone-300 hover:border-red-600 active:border-red-600 transition-colors overflow-hidden group rounded-lg">
 
       <button
         type="button"
