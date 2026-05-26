@@ -1,20 +1,22 @@
 import { useEffect, useRef, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
-import { getUser, getUserRatings, updateUser, createRating } from '@/services/api'
+import { useParams, Link, useNavigate } from 'react-router-dom'
+import { getUser, getUserRatings, updateUser, createRating, getUserPosts, deletePost } from '@/services/api'
 import { useAuth } from '@/context/AuthContext'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Button } from '@/components/ui/button'
-import { ImagePlus, Star, Pencil, X, MessageSquare } from 'lucide-react'
+import { ImagePlus, Star, Pencil, X, MessageSquare, Trash2 } from 'lucide-react'
 
 export default function UserProfile() {
   const { id } = useParams()
   const { user: authUser, refreshUser } = useAuth()
+  const navigate = useNavigate()
   const isOwn = authUser?.id === Number(id)
 
   const [profile, setProfile] = useState(null)
   const [ratings, setRatings] = useState([])
+  const [userPosts, setUserPosts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
 
@@ -43,13 +45,15 @@ export default function UserProfile() {
 
     async function load() {
       try {
-        const [userRes, ratingsRes] = await Promise.all([
+        const [userRes, ratingsRes, postsRes] = await Promise.all([
           getUser(id),
           getUserRatings(id),
+          getUserPosts(id),
         ])
         if (!cancelled) {
           setProfile(userRes.data)
           setRatings(ratingsRes.data)
+          setUserPosts(postsRes.data)
         }
       } catch {
         if (!cancelled) setError('No se pudo cargar el perfil.')
@@ -120,6 +124,16 @@ export default function UserProfile() {
       setRatingError(err.response?.data?.error || 'Error al enviar la valoración.')
     } finally {
       setRatingSubmitting(false)
+    }
+  }
+
+  const handleDeletePost = async (postId) => {
+    if (!window.confirm('¿Seguro que quieres eliminar este anuncio?')) return
+    try {
+      await deletePost(postId)
+      setUserPosts((prev) => prev.filter((p) => p.id !== postId))
+    } catch {
+      alert('Error al eliminar el anuncio.')
     }
   }
 
@@ -350,6 +364,45 @@ export default function UserProfile() {
                 <p className="text-xs text-stone-500 uppercase tracking-widest">Ya has valorado a este usuario.</p>
               </div>
             )}
+
+            <div className="border border-stone-300 bg-white p-6">
+              <p className="text-xs uppercase tracking-widest text-stone-500 font-bold border-b border-stone-200 pb-3 mb-4">
+                Anuncios {userPosts.length > 0 && `· ${userPosts.length}`}
+              </p>
+              {userPosts.length === 0 ? (
+                <p className="text-stone-400 text-xs italic">Sin anuncios aún.</p>
+              ) : (
+                <div className="space-y-2">
+                  {userPosts.map((post) => (
+                    <div
+                      key={post.id}
+                      className="flex items-center justify-between border border-stone-200 px-4 py-3 hover:border-stone-400 transition-colors"
+                    >
+                      <button
+                        onClick={() => navigate(`/anuncio/${post.id}`)}
+                        className="flex items-center gap-3 text-left flex-1 min-w-0"
+                      >
+                        {post.image && (
+                          <img src={post.image} alt={post.title} className="h-12 w-12 object-cover border border-stone-200 flex-shrink-0" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="text-sm font-bold text-stone-900 truncate">{post.title}</p>
+                          <p className="text-xs text-stone-400 uppercase tracking-widest mt-0.5">{post.type} · {post.status}</p>
+                        </div>
+                      </button>
+                      {isOwn && (
+                        <button
+                          onClick={() => handleDeletePost(post.id)}
+                          className="ml-4 flex-shrink-0 text-stone-400 hover:text-red-600 transition-colors p-1"
+                        >
+                          <Trash2 size={15} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
 
             <div className="border border-stone-300 bg-white p-6">
               <p className="text-xs uppercase tracking-widest text-stone-500 font-bold border-b border-stone-200 pb-3 mb-4">

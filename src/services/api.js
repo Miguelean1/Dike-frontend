@@ -22,6 +22,7 @@ export const resetPassword = (token, password) => api.post('/auth/reset-password
 
 export const getUser = (id) => api.get(`/users/${id}`)
 export const updateUser = (id, data) => api.put(`/users/${id}`, data)
+export const getUserPosts = (id) => api.get(`/users/${id}/posts`)
 
 export const getPosts = (params) => api.get('/posts', { params })
 export const getPost = (id) => api.get(`/posts/${id}`)
