@@ -115,4 +115,28 @@ describe('Feed', () => {
     expect(screen.getByRole('button', { name: /anterior/i })).toBeDisabled()
     expect(screen.getByRole('button', { name: /siguiente/i })).not.toBeDisabled()
   })
+
+  it('calls API with new page param when Siguiente is clicked', async () => {
+    mockGetPosts.mockResolvedValue({ data: { posts: makePosts(12), total: 24, page: 1, totalPages: 2 } })
+    renderFeed()
+    await waitFor(() => expect(screen.getByRole('button', { name: /siguiente/i })).toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('button', { name: /siguiente/i }))
+
+    await waitFor(() => {
+      expect(mockGetPosts).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }))
+    })
+  })
+
+  it('calls API with type filter when Donaciones is clicked', async () => {
+    mockGetPosts.mockResolvedValue({ data: { posts: [], total: 0, page: 1, totalPages: 1 } })
+    renderFeed()
+    await waitFor(() => expect(screen.queryByText(/cargando/i)).not.toBeInTheDocument())
+
+    await userEvent.click(screen.getByRole('button', { name: /donaciones/i }))
+
+    await waitFor(() => {
+      expect(mockGetPosts).toHaveBeenCalledWith(expect.objectContaining({ type: 'donation' }))
+    })
+  })
 })
