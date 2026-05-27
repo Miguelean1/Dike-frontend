@@ -32,7 +32,7 @@ export default function Footer() {
   }
 
   return (
-    <footer className="bg-stone-800 border-t border-stone-700 mt-auto">
+    <footer className="bg-stone-900 border-t border-stone-800 mt-auto">
       <div className="max-w-7xl mx-auto px-4 py-10 grid grid-cols-1 md:grid-cols-3 gap-8 items-start">
 
         <div className="flex flex-col gap-3">
@@ -43,7 +43,7 @@ export default function Footer() {
               aria-label={label}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-3 text-stone-500 hover:text-stone-300 transition-colors w-fit"
+              className="flex items-center gap-3 text-white hover:text-stone-300 transition-colors w-fit"
             >
               <Icon size={18} />
               <span className="text-xs tracking-wide">{label}</span>
@@ -52,8 +52,8 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center justify-center text-center gap-2">
-          <Logo className="h-18" />
-          <p className="text-stone-600 text-xs tracking-wide">
+          <Logo className="h-18" src="https://res.cloudinary.com/dhhxrrgut/image/upload/v1779906454/copy_of_logonoborder.png" />
+          <p className="text-white text-xs tracking-wide">
             Plataforma de préstamos y donaciones · {new Date().getFullYear()}
           </p>
           <nav className="flex items-center gap-4 mt-1">
