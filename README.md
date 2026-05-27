@@ -17,8 +17,9 @@ Sin dinero de por medio. Sin plataformas frías. Solo personas ayudando a person
 ## Capturas de pantalla
 
 <img width="823" height="743" alt="readmeTFG1" src="https://github.com/user-attachments/assets/e0286e66-2cde-47e5-9e15-c0d27c8986f7" />
-<img width="1113" height="1260" alt="readmetfg3Buena" src="https://github.com/user-attachments/assets/3a2dcc2f-31ef-4840-be2f-b82393cea68d" />
-<img width="1566" height="1242" alt="readmetfg2" src="https://github.com/user-attachments/assets/92efca72-9627-479d-8720-3693bc50269f" />
+<img width="1392" height="1262" alt="landingBuena" src="https://github.com/user-attachments/assets/eeb3d259-e264-4ed5-a039-c6e5f3552c15" />
+<img width="1438" height="1266" alt="perfilBuena" src="https://github.com/user-attachments/assets/562c73c8-701f-4ea7-aa91-fd69f2800c23" />
+
 <img width="1447" height="445" alt="readmetfg4" src="https://github.com/user-attachments/assets/8b1912ac-77eb-4059-96b7-be8f3d58dcf3" />
 
 
